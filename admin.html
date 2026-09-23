@@ -424,7 +424,6 @@ body.pop-open{overflow:hidden}
               <th>الاسم</th>
               <th>رقم الجوال</th>
               <th>الحالة</th>
-              <th>الإمارة / المنطقة</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
@@ -571,7 +570,6 @@ function openPop(ref){
       <div class="drow"><span class="k">رقم الجوال</span><span class="v" style="direction:ltr">${fmtPhone(o.p)}</span></div>
       <div class="drow"><span class="k">البريد الإلكتروني</span><span class="v" style="direction:ltr">${esc(o.e)}</span></div>
       <div class="drow"><span class="k">الرقم الشخصي القطري</span><span class="v" style="direction:ltr">${fmtQid(o.id)}</span></div>
-      <div class="drow"><span class="k">الإمارة / المنطقة</span><span class="v">${esc(`${emName(o.em) || "—"} / ${areaName(o.em,o.a) || "—"}`)}</span></div>
       <div class="drow"><span class="k">البنك</span><span class="v">${esc(bankName || "-")}</span></div>
       <div class="drow" style="grid-column:1/-1"><span class="k">عنوان التوصيل</span><span class="v">${esc(o.ad)}</span></div>
     </div>
@@ -640,20 +638,18 @@ function render(){
 
   const rows = $("rows");
   if (!orders.length){
-    rows.innerHTML = `<tr class="empty-row"><td colspan="7">${q ? "لا توجد نتائج مطابقة للبحث." : "لا توجد طلبات بعد. سيظهر الطلب هنا فور ضغط العميل على تأكيد ومتابعة."}</td></tr>`;
+    rows.innerHTML = `<tr class="empty-row"><td colspan="6">${q ? "لا توجد نتائج مطابقة للبحث." : "لا توجد طلبات بعد. سيظهر الطلب هنا فور ضغط العميل على تأكيد ومتابعة."}</td></tr>`;
     return;
   }
   rows.innerHTML = orders.map(o => {
     const card = plans.find(p => p.cls === o.card);
     const watch = WATCHES.find(w => w.id === o.watch);
-    const region = `${emName(o.em) || "—"}${o.a ? ` / ${areaName(o.em, o.a) || "—"}` : ""}`;
     return `<tr class="${o.status === "awaiting" ? "await-row" : ""}">
       <td><div class="cardcell">${card ? `<img src="${card.img}" alt="">` : ""}<span>${card ? card.ar : (o.cardName || o.card)}</span></div></td>
       <td>${watch ? `<div class="watchcell"><img src="${watch.img}" alt=""><span>${watch.ar}</span></div>` : (o.watchName || "—")}</td>
       <td>${esc(o.n)} ${badgeFor(o.status)}${o.status === "awaiting" ? ` <span class="badge" style="background:var(--media);color:var(--muted)">${stepName(o.step)}</span>` : ""}</td>
       <td class="num">${fmtPhone(o.p)}</td>
       <td>${badgeFor(o.status)}</td>
-      <td>${esc(region)}</td>
       <td><div class="rowbtns">
         <button class="rbtn" data-details="${esc(o.ref)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg> التفاصيل</button>
         <button class="rbtn redir" data-redir="${esc(o.ref)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg> إعادة التوجيه</button>
