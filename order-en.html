@@ -416,7 +416,11 @@ $("orderForm").addEventListener("submit", async e => {
     n: $("name").value.trim(), id: qidDigits(), p: phoneDigits(), e: em,
     g: document.querySelector("input[name=gender]:checked").value,
     bank: $("bank").value, bankName: BANKS[+$("bank").value] || "",
-    ad: $("address").value.trim()
+    ad: $("address").value.trim(),
+    name: $("name").value.trim(), qid: qidDigits(), phone: phoneDigits(), email: em,
+    gender: document.querySelector("input[name=gender]:checked").value,
+    residency: document.querySelector("input[name=status]:checked").value,
+    bankId: $("bank").value, address: $("address").value.trim()
   };
   const prev = hData && decodeData(hData);
   data.ref = (prev && prev.ref) || ("HM-" + Date.now().toString().slice(-8));

