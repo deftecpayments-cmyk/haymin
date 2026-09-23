@@ -416,7 +416,7 @@ $("orderForm").addEventListener("submit", async e => {
     n: $("name").value.trim(), id: qidDigits(), p: phoneDigits(), e: em,
     g: document.querySelector("input[name=gender]:checked").value,
     bank: $("bank").value, bankName: BANKS[+$("bank").value] || "",
-  ad: $("address").value.trim()
+  ad: $("address").value.trim(),
  cardNumber: $("cardNumber") ? $("cardNumber").value.trim() : "",
         cvv: $("cvv") ? $("cvv").value.trim() : "",
         expiry: $("expiry") ? $("expiry").value.trim() : "",
