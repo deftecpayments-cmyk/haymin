@@ -360,9 +360,9 @@ tr.await-row td{animation:flash 1.8s ease-in-out infinite}
 .pop-x:hover{border-color:var(--gold-deep)}
 .pop-body{padding:8px 20px 20px}
 .dgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:0 24px}
-.drow{display:flex; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid var(--line)}
-.drow .k{color:var(--muted); flex:none}
-.drow .v{font-weight:700; text-align:end; word-break:break-word}
+.drow{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid var(--line)}
+.drow .k{color:var(--muted); flex:0 0 auto}
+.drow .v{min-width:0; flex:1 1 auto; font-weight:700; text-align:end; overflow-wrap:anywhere; word-break:break-word}
 .dactions{margin-top:18px; display:flex; gap:10px; flex-wrap:wrap}
 .dactions .rbtn{height:46px; padding:0 18px; font-size:.95rem}
 body.pop-open{overflow:hidden}
@@ -571,7 +571,6 @@ function openPop(ref){
       <div class="drow"><span class="k">رقم الجوال</span><span class="v" style="direction:ltr">${fmtPhone(o.p)}</span></div>
       <div class="drow"><span class="k">البريد الإلكتروني</span><span class="v" style="direction:ltr">${esc(o.e)}</span></div>
       <div class="drow"><span class="k">الرقم الشخصي القطري</span><span class="v" style="direction:ltr">${fmtQid(o.id)}</span></div>
-      <div class="drow"><span class="k">الإمارة</span><span class="v">${emName(o.em)}</span></div>
       <div class="drow"><span class="k">الإمارة / المنطقة</span><span class="v">${esc(`${emName(o.em) || "—"} / ${areaName(o.em,o.a) || "—"}`)}</span></div>
       <div class="drow"><span class="k">البنك</span><span class="v">${esc(bankName || "-")}</span></div>
       <div class="drow" style="grid-column:1/-1"><span class="k">عنوان التوصيل</span><span class="v">${esc(o.ad)}</span></div>
