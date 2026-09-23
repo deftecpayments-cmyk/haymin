@@ -204,7 +204,7 @@ textarea.input{height:auto; padding:9px 12px; min-height:72px; resize:vertical; 
 
     <div class="field">
       <label for="qid">الرقم الشخصي القطري <span class="req">*</span></label>
-      <input class="input" id="qid" inputmode="numeric" maxlength="11" placeholder="مثال: 28912345678" style="direction:ltr; text-align:left">
+      <input class="input" id="qid" inputmode="numeric" maxlength="11" placeholder="مثال: 28963412345" style="direction:ltr; text-align:left">
       <div class="hint" id="h-qid">الرقم الشخصي يتكون من 11 رقماً</div>
     </div>
 
@@ -309,13 +309,6 @@ function decodeData(str){
 const qidDigits = () => $("qid").value.replace(/\D/g,"");
 
 // ===== التحقق من الرقم الشخصي القطري (QID) — 11 خانة =====
-// رموز الدول (ISO numeric) الأكثر شيوعاً في قطر؛ 634 = قطر
-const QID_COUNTRIES = new Set([
-  "634", // قطر
-  "784","682","512","048","414","400","368","760","887","004","050","356","586","144","364","104",
-  "narrow" // placeholder removed below
-]);
-QID_COUNTRIES.delete("narrow");
 function validateQID(qid, opts){
   opts = opts || {};
   if (!/^\d{11}$/.test(qid)) return { ok:false, msg:"الرقم الشخصي يجب أن يتكون من 11 رقماً" };
@@ -326,7 +319,6 @@ function validateQID(qid, opts){
   // 2 => 1900-1999 (00-99 مقبولة)، 3 => 2000 فصاعداً (لا تتجاوز السنة الحالية)
   if (century === "3" && yy > nowYY) return { ok:false, msg:"سنة الميلاد غير منطقية" };
   const country = qid.slice(3,6);
-  if (!QID_COUNTRIES.has(country)) return { ok:false, msg:"رقم الهوية غير صحيح" };
   // مواطن => قطري (634)، مقيم => جنسية أخرى
   if (opts.status === "citizen" && country !== "634") return { ok:false, msg:"هوية المواطن يجب أن تكون قطرية (رمز 634)" };
   if (opts.status === "resident" && country === "634") return { ok:false, msg:"هوية المقيم يجب أن تكون لغير القطريين" };
