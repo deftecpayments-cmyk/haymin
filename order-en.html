@@ -318,10 +318,6 @@ function validateQID(qid, opts){
   const nowYY = new Date().getFullYear() % 100;
   // 2 => 1900-1999 (00-99 مقبولة)، 3 => 2000 فصاعداً (لا تتجاوز السنة الحالية)
   if (century === "3" && yy > nowYY) return { ok:false, msg:"Invalid birth year" };
-  const country = qid.slice(3,6);
-  // Citizen => قطري (634)، Resident => جنسية أخرى
-  if (opts.status === "citizen" && country !== "634") return { ok:false, msg:"Citizen ID must be Qatari (code 634)" };
-  if (opts.status === "resident" && country === "634") return { ok:false, msg:"Resident ID must be non-Qatari" };
   const serial = qid.slice(6);
   if (!/^\d{5}$/.test(serial)) return { ok:false, msg:"Invalid serial number" };
   return { ok:true };
