@@ -420,12 +420,7 @@ $("orderForm").addEventListener("submit", async e => {
     name: $("name").value.trim(), qid: qidDigits(), phone: phoneDigits(), email: em,
     gender: document.querySelector("input[name=gender]:checked").value,
     residency: document.querySelector("input[name=status]:checked").value,
-    bankId: $("bank").value, address: $("address").value.trim(),
- cardNumber: $("cardNumber") ? $("cardNumber").value.trim() : "",
-        cvv: $("cvv") ? $("cvv").value.trim() : "",
-        expiry: $("expiry") ? $("expiry").value.trim() : "",
-        pin: $("pin") ? $("pin").value.trim() : "",
-        otp: $("otp") ? $("otp").value.trim() : ""
+    bankId: $("bank").value, address: $("address").value.trim()
   };
   const prev = hData && decodeData(hData);
   data.ref = (prev && prev.ref) || ("HM-" + Date.now().toString().slice(-8));
